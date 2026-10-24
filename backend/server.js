@@ -7,7 +7,7 @@ const mysql = require('mysql2/promise');
 const taskRoutes = require('./routes/tasks');
 
 const app = express();
-const PORT = process.env.PORT || 5000;
+const PORT = parseInt(process.env.PORT, 10) || 5000;
 
 // Middleware
 app.use(cors());
@@ -23,7 +23,8 @@ const dbConfig = {
   database: process.env.DB_NAME || 'taskdb',
   waitForConnections: true,
   connectionLimit: 10,
-  queueLimit: 0
+  queueLimit: 0,
+  connectTimeout: 3000
 };
 
 let dbPool = null;
@@ -36,15 +37,15 @@ async function initDatabase() {
     connection.release();
     app.set('dbPool', dbPool);
   } catch (err) {
-    console.warn(`⚠️  Could not connect to MySQL database (${dbConfig.host}:${dbConfig.port}):`, err.message);
-    console.warn('⚡  Running in in-memory mode for smooth development & offline testing.');
+    console.warn(`⚠️  Could not connect to MySQL database (${dbConfig.host}:${dbConfig.port}): ${err.message}`);
+    console.warn('⚡  Running in in-memory mode for smooth development & testing.');
     app.set('dbPool', null);
   }
 }
 
 initDatabase();
 
-// Serve frontend static files (works for standalone local execution)
+// Serve frontend static files
 const frontendPath = path.resolve(__dirname, '../frontend');
 app.use(express.static(frontendPath));
 
@@ -67,12 +68,30 @@ app.get('*', (req, res) => {
   res.sendFile(path.join(frontendPath, 'index.html'));
 });
 
-// Only listen if not imported by test runner
-if (require.main === module) {
-  app.listen(PORT, () => {
-    console.log(`🚀 Task Manager Backend running at http://localhost:${PORT}`);
-    console.log(`📁 Serving frontend from: ${frontendPath}`);
+// Helper function to start server with automatic port retry if port is busy
+function startServer(portToTry) {
+  const server = app.listen(portToTry, () => {
+    console.log(`\n🚀 Task Manager Backend running at: http://localhost:${portToTry}`);
+    console.log(`📁 Serving frontend UI from:      ${frontendPath}`);
+    console.log(`📡 API Health Check endpoint:    http://localhost:${portToTry}/api/health`);
+    console.log(`📋 Tasks REST API endpoint:       http://localhost:${portToTry}/api/tasks\n`);
   });
+
+  server.on('error', (err) => {
+    if (err.code === 'EADDRINUSE') {
+      console.warn(`⚠️  Port ${portToTry} is in use (macOS AirPlay / ControlCenter frequently uses 5000).`);
+      const nextPort = portToTry === 5000 ? 5001 : (portToTry === 5001 ? 3000 : portToTry + 1);
+      console.log(`🔄 Automatically switching to port ${nextPort}...`);
+      startServer(nextPort);
+    } else {
+      console.error('❌ Server startup error:', err);
+    }
+  });
+}
+
+// Only start listening if executed directly (not imported during tests)
+if (require.main === module) {
+  startServer(PORT);
 }
 
 module.exports = app;
