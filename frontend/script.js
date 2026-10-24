@@ -3,9 +3,9 @@
  */
 
 // Configuration & API Endpoint Detection
-const API_BASE = window.location.origin.startsWith('http') 
+let API_BASE = window.location.origin.startsWith('http') && !window.location.port.match(/^(5500|5501|8080)$/)
   ? '/api' 
-  : 'http://localhost:3000/api';
+  : 'http://localhost:5001/api';
 
 // Application State
 const state = {
@@ -215,20 +215,30 @@ function setupEventListeners() {
 // ==========================================================================
 
 async function checkHealth() {
-  try {
-    const res = await fetch(`${API_BASE}/health`, { signal: AbortSignal.timeout(3000) });
-    if (res.ok) {
-      const data = await res.json();
-      state.isBackendAvailable = true;
-      if (data.database === 'mysql-connected') {
-        updateStatusPill('online', 'MySQL Connected');
-      } else {
-        updateStatusPill('memory', 'In-Memory Mode');
+  const candidateUrls = [
+    API_BASE,
+    'http://localhost:5001/api',
+    'http://localhost:5000/api',
+    'http://localhost:3000/api'
+  ];
+
+  for (const url of candidateUrls) {
+    try {
+      const res = await fetch(`${url}/health`, { signal: AbortSignal.timeout(2000) });
+      if (res.ok) {
+        const data = await res.json();
+        API_BASE = url;
+        state.isBackendAvailable = true;
+        if (data.database === 'mysql-connected') {
+          updateStatusPill('online', 'MySQL Connected');
+        } else {
+          updateStatusPill('memory', 'In-Memory Mode');
+        }
+        return true;
       }
-      return true;
+    } catch (err) {
+      // Continue trying next candidate
     }
-  } catch (err) {
-    // API server is unreachable
   }
 
   state.isBackendAvailable = false;
