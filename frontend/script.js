@@ -91,7 +91,7 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 function initTheme() {
-  const savedTheme = localStorage.getItem('taskflow_theme') || 'dark';
+  const savedTheme = localStorage.getItem('taskflow_theme') || 'light';
   document.body.setAttribute('data-theme', savedTheme);
   updateThemeIcon(savedTheme);
 }
@@ -99,9 +99,9 @@ function initTheme() {
 function updateThemeIcon(theme) {
   const icon = elements.themeToggleBtn.querySelector('i');
   if (theme === 'light') {
-    icon.className = 'fa-solid fa-sun';
-  } else {
     icon.className = 'fa-solid fa-moon';
+  } else {
+    icon.className = 'fa-solid fa-sun';
   }
 }
 
@@ -112,7 +112,7 @@ function updateThemeIcon(theme) {
 function setupEventListeners() {
   // Theme Toggle
   elements.themeToggleBtn.addEventListener('click', () => {
-    const currentTheme = document.body.getAttribute('data-theme') || 'dark';
+    const currentTheme = document.body.getAttribute('data-theme') || 'light';
     const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
     document.body.setAttribute('data-theme', newTheme);
     localStorage.setItem('taskflow_theme', newTheme);
@@ -465,7 +465,7 @@ function createTaskCardHTML(task) {
         <div class="task-top-row">
           <h3 class="task-title">${escapeHTML(task.title)}</h3>
           <div class="task-badges">
-            <span class="badge badge-priority-${priority}">${priority}</span>
+            <span class="badge badge-priority-${priority}">${priority.charAt(0).toUpperCase() + priority.slice(1)}</span>
             <span class="badge badge-status-${status}">${statusLabels[status] || status}</span>
           </div>
         </div>
