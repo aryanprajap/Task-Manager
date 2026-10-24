@@ -19,11 +19,11 @@ CREATE TABLE IF NOT EXISTS tasks (
     INDEX idx_priority (priority)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Seed initial demonstration data
+-- Realistic human demonstration tasks
 INSERT INTO tasks (title, description, status, priority, due_date) VALUES
-    ('Set up Git Repository & Branching Strategy', 'Initialize Git repo with main and feature branches for team workflow.', 'completed', 'high', DATE_SUB(CURRENT_DATE(), INTERVAL 2 DAY)),
-    ('Build Responsive Web Interface', 'Develop mobile-friendly HTML/CSS/JS frontend with live status dashboard.', 'completed', 'medium', DATE_SUB(CURRENT_DATE(), INTERVAL 1 DAY)),
-    ('Develop Node.js & Express REST API', 'Implement CRUD routes with MySQL connection pooling and error handling.', 'in-progress', 'high', DATE_ADD(CURRENT_DATE(), INTERVAL 2 DAY)),
-    ('Dockerize Multi-Container Architecture', 'Configure Dockerfile and docker-compose.yml for Frontend, Backend, and MySQL.', 'in-progress', 'urgent', DATE_ADD(CURRENT_DATE(), INTERVAL 3 DAY)),
-    ('Implement GitHub Actions CI/CD Pipeline', 'Automate testing, Docker image building, and pushing to Docker Hub.', 'pending', 'high', DATE_ADD(CURRENT_DATE(), INTERVAL 5 DAY)),
-    ('Deploy to Cloud Server & Prepare Viva', 'Deploy containerized stack onto AWS EC2 or local Docker host.', 'pending', 'medium', DATE_ADD(CURRENT_DATE(), INTERVAL 7 DAY));
+    ('Submit Cloud Computing lab record (Unit 3 & 4)', 'Get sign-off from lab assistant and attach screenshot of AWS VPC architecture.', 'pending', 'urgent', DATE_ADD(CURRENT_DATE(), INTERVAL 1 DAY)),
+    ('Prepare presentation slides for Minor Project viva', 'Include architecture diagram, Docker Compose flow, and CI/CD pipeline steps.', 'in-progress', 'high', DATE_ADD(CURRENT_DATE(), INTERVAL 3 DAY)),
+    ('Review MySQL indexing and Docker networking questions', 'Prepare answers for viva voce on container communication and volume persistence.', 'pending', 'medium', DATE_ADD(CURRENT_DATE(), INTERVAL 4 DAY)),
+    ('Schedule project review with guide Dr. Sharma', 'Discuss EC2 free-tier hosting and demo recording for final evaluation.', 'pending', 'medium', DATE_ADD(CURRENT_DATE(), INTERVAL 5 DAY)),
+    ('Buy project file binder and print synopsis draft', 'Print 2 copies of abstract and system requirement specifications.', 'completed', 'low', DATE_SUB(CURRENT_DATE(), INTERVAL 1 DAY)),
+    ('Set up GitHub repository and push initial code', 'Initialized git repository with main branch and added .gitignore.', 'completed', 'high', DATE_SUB(CURRENT_DATE(), INTERVAL 2 DAY));

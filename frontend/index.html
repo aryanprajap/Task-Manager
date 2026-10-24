@@ -3,10 +3,10 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Task Manager - Clean, simple, and intuitive task management application.">
+  <meta name="description" content="Task Manager - Student Project for Cloud & DevOps">
   <title>Task Manager</title>
   
-  <!-- Clean, Natural Human Typography (Inter) -->
+  <!-- System & Inter Typography -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -17,178 +17,199 @@
   <link rel="stylesheet" href="style.css">
 </head>
 <body data-theme="light">
-  <!-- Top Navigation Bar -->
-  <header class="app-header">
-    <div class="container header-container">
-      <div class="brand">
-        <div class="brand-icon">
-          <i class="fa-solid fa-check-double"></i>
-        </div>
-        <div class="brand-text">
-          <h1>Task Manager</h1>
+
+  <div class="app-layout">
+    
+    <!-- Left Navigation Sidebar -->
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <div class="brand">
+          <div class="brand-avatar">
+            <i class="fa-solid fa-check"></i>
+          </div>
+          <div class="brand-info">
+            <h1 class="brand-title">Task Manager</h1>
+            <span class="brand-sub">MCA DevOps Lab</span>
+          </div>
         </div>
       </div>
 
-      <div class="header-actions">
-        <!-- Live Connection Status -->
-        <div id="connectionStatus" class="status-pill status-connecting" title="Database status">
+      <nav class="sidebar-nav">
+        <div class="nav-label">VIEWS</div>
+        <button class="nav-item tab-btn active" data-status="all">
+          <span class="nav-left">
+            <i class="fa-solid fa-inbox nav-icon"></i>
+            <span>All Tasks</span>
+          </span>
+          <span class="count-pill" id="statTotal">0</span>
+        </button>
+
+        <button class="nav-item tab-btn" data-status="pending">
+          <span class="nav-left">
+            <i class="fa-regular fa-clock nav-icon"></i>
+            <span>Pending</span>
+          </span>
+          <span class="count-pill" id="statPending">0</span>
+        </button>
+
+        <button class="nav-item tab-btn" data-status="in-progress">
+          <span class="nav-left">
+            <i class="fa-solid fa-arrows-rotate nav-icon"></i>
+            <span>In Progress</span>
+          </span>
+          <span class="count-pill" id="statInProgress">0</span>
+        </button>
+
+        <button class="nav-item tab-btn" data-status="completed">
+          <span class="nav-left">
+            <i class="fa-regular fa-circle-check nav-icon"></i>
+            <span>Completed</span>
+          </span>
+          <span class="count-pill" id="statCompleted">0</span>
+        </button>
+
+        <div class="nav-label" style="margin-top: 24px;">FILTER BY PRIORITY</div>
+        <div class="priority-nav-list">
+          <button class="prio-filter-btn active" data-prio="all">
+            <span class="prio-indicator all"></span> All
+          </button>
+          <button class="prio-filter-btn" data-prio="urgent">
+            <span class="prio-indicator urgent"></span> Urgent
+          </button>
+          <button class="prio-filter-btn" data-prio="high">
+            <span class="prio-indicator high"></span> High
+          </button>
+          <button class="prio-filter-btn" data-prio="medium">
+            <span class="prio-indicator medium"></span> Medium
+          </button>
+          <button class="prio-filter-btn" data-prio="low">
+            <span class="prio-indicator low"></span> Low
+          </button>
+        </div>
+      </nav>
+
+      <!-- Sidebar Bottom Info -->
+      <div class="sidebar-footer">
+        <div id="connectionStatus" class="status-pill status-connecting" title="Backend database status">
           <span class="status-dot"></span>
           <span class="status-text">Connecting...</span>
         </div>
-
-        <!-- Theme Toggle -->
-        <button id="themeToggleBtn" class="icon-btn" aria-label="Toggle Theme" title="Toggle dark/light mode">
-          <i class="fa-solid fa-moon"></i>
-        </button>
-
-        <!-- New Task Button -->
-        <button id="openNewTaskBtn" class="btn btn-primary">
-          <i class="fa-solid fa-plus"></i>
-          <span>Add Task</span>
-        </button>
+        <div class="tech-tag">Docker Compose &bull; MySQL 8</div>
       </div>
-    </div>
-  </header>
+    </aside>
 
-  <!-- Main Content -->
-  <main class="main-content">
-    <div class="container">
+    <!-- Main Content Workspace -->
+    <main class="main-content">
       
-      <!-- Summary / Stats Cards -->
-      <section class="stats-grid" aria-label="Task Summary">
-        <div class="stat-card" data-filter="all">
-          <div class="stat-header">
-            <span class="stat-label">Total Tasks</span>
-            <span class="stat-icon total-icon"><i class="fa-solid fa-list-check"></i></span>
-          </div>
-          <div class="stat-value" id="statTotal">0</div>
-          <div class="stat-footer">
-            <span class="stat-subtext">All active & finished</span>
-          </div>
+      <!-- Topbar Header -->
+      <header class="topbar">
+        <div class="topbar-left">
+          <h2 id="viewHeading" class="view-heading">All Tasks</h2>
+          <span id="dateSubtitle" class="date-subtitle"></span>
         </div>
 
-        <div class="stat-card" data-filter="pending">
-          <div class="stat-header">
-            <span class="stat-label">Pending</span>
-            <span class="stat-icon pending-icon"><i class="fa-regular fa-clock"></i></span>
-          </div>
-          <div class="stat-value" id="statPending">0</div>
-          <div class="stat-footer">
-            <span class="stat-subtext">To be started</span>
-          </div>
-        </div>
-
-        <div class="stat-card" data-filter="in-progress">
-          <div class="stat-header">
-            <span class="stat-label">In Progress</span>
-            <span class="stat-icon progress-icon"><i class="fa-solid fa-spinner"></i></span>
-          </div>
-          <div class="stat-value" id="statInProgress">0</div>
-          <div class="stat-footer">
-            <span class="stat-subtext">Currently working</span>
-          </div>
-        </div>
-
-        <div class="stat-card" data-filter="completed">
-          <div class="stat-header">
-            <span class="stat-label">Completed</span>
-            <span class="stat-icon completed-icon"><i class="fa-regular fa-circle-check"></i></span>
-          </div>
-          <div class="stat-value" id="statCompleted">0</div>
-          <div class="stat-footer">
-            <div class="progress-bar-container">
-              <div class="progress-bar-fill" id="completionRateFill" style="width: 0%"></div>
-            </div>
-            <span class="stat-rate" id="completionRateText">0% Done</span>
-          </div>
-        </div>
-      </section>
-
-      <!-- Search & Filters Toolbar -->
-      <section class="controls-card">
-        <div class="search-box">
-          <i class="fa-solid fa-magnifying-glass search-icon"></i>
-          <input type="text" id="searchInput" placeholder="Search tasks..." autocomplete="off">
-          <button id="clearSearchBtn" class="clear-search-btn" style="display: none;" title="Clear search">
-            <i class="fa-solid fa-xmark"></i>
-          </button>
-        </div>
-
-        <div class="filter-group">
-          <!-- Status Tabs -->
-          <div class="status-tabs" role="tablist">
-            <button class="tab-btn active" data-status="all">All</button>
-            <button class="tab-btn" data-status="pending">Pending</button>
-            <button class="tab-btn" data-status="in-progress">In Progress</button>
-            <button class="tab-btn" data-status="completed">Completed</button>
+        <div class="topbar-right">
+          <!-- Search Input -->
+          <div class="search-box">
+            <i class="fa-solid fa-magnifying-glass search-icon"></i>
+            <input type="text" id="searchInput" placeholder="Search tasks (Press /)..." autocomplete="off">
+            <button id="clearSearchBtn" class="clear-search-btn" style="display: none;" title="Clear search">
+              <i class="fa-solid fa-xmark"></i>
+            </button>
           </div>
 
-          <!-- Priority Filter -->
-          <div class="select-wrapper">
-            <select id="priorityFilter" aria-label="Filter by priority">
-              <option value="all">Priority: All</option>
-              <option value="low">Low</option>
-              <option value="medium">Medium</option>
-              <option value="high">High</option>
-              <option value="urgent">Urgent</option>
-            </select>
-            <i class="fa-solid fa-chevron-down select-caret"></i>
-          </div>
-
-          <!-- Sort Order -->
+          <!-- Sort Dropdown -->
           <div class="select-wrapper">
             <select id="sortOrder" aria-label="Sort tasks">
-              <option value="newest">Newest First</option>
-              <option value="oldest">Oldest First</option>
-              <option value="due_asc">Due Date (Earliest)</option>
-              <option value="due_desc">Due Date (Latest)</option>
-              <option value="priority">Priority (High to Low)</option>
+              <option value="newest">Sort: Newest</option>
+              <option value="oldest">Sort: Oldest</option>
+              <option value="due_asc">Sort: Due date</option>
+              <option value="priority">Sort: Priority</option>
             </select>
             <i class="fa-solid fa-chevron-down select-caret"></i>
           </div>
-        </div>
-      </section>
 
-      <!-- Task List Stream -->
-      <section class="task-list-section">
-        <div class="section-meta">
-          <h2 class="section-title">
-            <span>Tasks</span>
-            <span class="count-badge" id="tasksCountBadge">0</span>
-          </h2>
-          <button id="refreshBtn" class="refresh-btn" title="Refresh tasks">
+          <!-- Hidden select to keep script.js 100% compatible -->
+          <select id="priorityFilter" style="display: none;">
+            <option value="all">all</option>
+          </select>
+
+          <!-- Refresh Button -->
+          <button id="refreshBtn" class="icon-btn" title="Refresh tasks">
             <i class="fa-solid fa-arrows-rotate"></i>
-            <span>Refresh</span>
+          </button>
+
+          <!-- Theme Toggle -->
+          <button id="themeToggleBtn" class="icon-btn" title="Toggle dark/light theme">
+            <i class="fa-solid fa-moon"></i>
+          </button>
+
+          <!-- Modal Trigger (also available as secondary option) -->
+          <button id="openNewTaskBtn" class="btn btn-primary">
+            <i class="fa-solid fa-plus"></i>
+            <span>New Task</span>
           </button>
         </div>
+      </header>
 
-        <!-- Task Items Container -->
+      <!-- Task Content Body -->
+      <div class="content-body">
+        
+        <!-- Quick Inline Add Task Form (Human-friendly fast input!) -->
+        <section class="quick-add-section">
+          <form id="quickAddForm" class="quick-add-form">
+            <i class="fa-solid fa-plus quick-icon"></i>
+            <input type="text" id="quickTaskTitle" placeholder="Add a task (e.g. 'Submit Cloud lab assignment')... Press Enter to save" autocomplete="off" required>
+            
+            <div class="quick-options">
+              <select id="quickTaskPriority" aria-label="Quick priority">
+                <option value="medium" selected>Priority: Medium</option>
+                <option value="high">Priority: High</option>
+                <option value="urgent">Priority: Urgent</option>
+                <option value="low">Priority: Low</option>
+              </select>
+
+              <input type="date" id="quickTaskDueDate" aria-label="Quick due date" title="Due date">
+              <button type="submit" class="btn btn-sm btn-primary">Add Task</button>
+            </div>
+          </form>
+        </section>
+
+        <!-- Progress Summary -->
+        <div class="progress-strip">
+          <div class="progress-bar-container">
+            <div class="progress-bar-fill" id="completionRateFill" style="width: 0%"></div>
+          </div>
+          <span class="stat-rate" id="completionRateText">0% completed</span>
+          <span class="tasks-count-pill" id="tasksCountBadge">0 tasks</span>
+        </div>
+
+        <!-- Task List Container -->
         <div id="tasksContainer" class="tasks-container">
-          <!-- Populated dynamically by script.js -->
+          <!-- Injected dynamically by script.js -->
         </div>
 
         <!-- Empty State -->
         <div id="emptyState" class="empty-state" style="display: none;">
-          <div class="empty-icon">
-            <i class="fa-regular fa-clipboard"></i>
-          </div>
-          <h3>No tasks found</h3>
+          <div class="empty-icon"><i class="fa-regular fa-clipboard"></i></div>
+          <h3>No tasks in this view</h3>
           <p id="emptyStateSubtitle">You don't have any tasks matching your filters.</p>
-          <button id="emptyCreateBtn" class="btn btn-primary">
-            <i class="fa-solid fa-plus"></i> Create a task
+          <button id="emptyCreateBtn" class="btn btn-secondary">
+            <i class="fa-solid fa-plus"></i> Create your first task
           </button>
         </div>
-      </section>
 
-    </div>
-  </main>
+      </div>
+    </main>
+
+  </div>
 
   <!-- Create / Edit Task Modal -->
   <div id="taskModal" class="modal" aria-hidden="true">
     <div class="modal-backdrop" id="modalBackdrop"></div>
     <div class="modal-dialog">
       <div class="modal-header">
-        <h3 id="modalTitle">Add New Task</h3>
+        <h3 id="modalTitle">Edit Task</h3>
         <button id="closeModalBtn" class="icon-btn close-btn" aria-label="Close modal">
           <i class="fa-solid fa-xmark"></i>
         </button>
@@ -198,13 +219,13 @@
         <input type="hidden" id="taskId">
 
         <div class="form-group">
-          <label for="taskTitle">Title <span class="required">*</span></label>
-          <input type="text" id="taskTitle" placeholder="e.g. Set up database backup" required maxlength="150">
+          <label for="taskTitle">Task Title <span class="required">*</span></label>
+          <input type="text" id="taskTitle" placeholder="e.g. Prepare presentation slides" required maxlength="150">
         </div>
 
         <div class="form-group">
-          <label for="taskDescription">Description</label>
-          <textarea id="taskDescription" rows="3" placeholder="Add any details or notes..."></textarea>
+          <label for="taskDescription">Notes / Details</label>
+          <textarea id="taskDescription" rows="3" placeholder="Add helpful context or subtasks..."></textarea>
         </div>
 
         <div class="form-row">
@@ -242,7 +263,7 @@
         <div class="modal-actions">
           <button type="button" id="cancelModalBtn" class="btn btn-secondary">Cancel</button>
           <button type="submit" id="saveTaskBtn" class="btn btn-primary">
-            <span id="saveBtnText">Save Task</span>
+            <span id="saveBtnText">Save Changes</span>
           </button>
         </div>
       </form>
@@ -260,35 +281,17 @@
         </button>
       </div>
       <div class="modal-body">
-        <p>Are you sure you want to delete <strong id="deleteTaskTitle">this task</strong>? This action cannot be undone.</p>
+        <p>Are you sure you want to delete <strong id="deleteTaskTitle">this task</strong>?</p>
       </div>
       <div class="modal-actions">
         <button type="button" id="cancelDeleteBtn" class="btn btn-secondary">Cancel</button>
-        <button type="button" id="confirmDeleteBtn" class="btn btn-danger">
-          Delete Task
-        </button>
+        <button type="button" id="confirmDeleteBtn" class="btn btn-danger">Delete</button>
       </div>
     </div>
   </div>
 
-  <!-- Toast Container -->
+  <!-- Toast Notification Container -->
   <div id="toastContainer" class="toast-container" aria-live="polite"></div>
-
-  <!-- Minimal Human Footer -->
-  <footer class="app-footer">
-    <div class="container footer-content">
-      <p>Task Manager &bull; Minor Project</p>
-      <div class="footer-tech">
-        <span>Node.js</span>
-        <span>&bull;</span>
-        <span>Express</span>
-        <span>&bull;</span>
-        <span>MySQL 8</span>
-        <span>&bull;</span>
-        <span>Docker</span>
-      </div>
-    </div>
-  </footer>
 
   <script src="script.js"></script>
 </body>

@@ -5,56 +5,66 @@ const router = express.Router();
 let inMemoryTasks = [
   {
     id: 1,
-    title: 'Set up Git Repository & Branching Strategy',
-    description: 'Initialize Git repo with main and feature branches for team workflow.',
-    status: 'completed',
-    priority: 'high',
-    due_date: new Date(Date.now() - 2 * 86400000).toISOString().split('T')[0],
+    title: 'Submit Cloud Computing lab record (Unit 3 & 4)',
+    description: 'Get sign-off from lab assistant and attach screenshot of AWS VPC architecture.',
+    status: 'pending',
+    priority: 'urgent',
+    due_date: new Date(Date.now() + 86400000).toISOString().split('T')[0],
     created_at: new Date().toISOString(),
     updated_at: new Date().toISOString()
   },
   {
     id: 2,
-    title: 'Build Responsive Web Interface',
-    description: 'Develop mobile-friendly HTML/CSS/JS frontend with live status dashboard.',
-    status: 'completed',
-    priority: 'medium',
-    due_date: new Date(Date.now() - 86400000).toISOString().split('T')[0],
-    created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString()
-  },
-  {
-    id: 3,
-    title: 'Develop Node.js & Express REST API',
-    description: 'Implement CRUD routes with MySQL connection pooling and error handling.',
+    title: 'Prepare presentation slides for Minor Project viva',
+    description: 'Include architecture diagram, Docker Compose flow, and CI/CD pipeline steps.',
     status: 'in-progress',
     priority: 'high',
-    due_date: new Date(Date.now() + 2 * 86400000).toISOString().split('T')[0],
-    created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString()
-  },
-  {
-    id: 4,
-    title: 'Dockerize Multi-Container Architecture',
-    description: 'Configure Dockerfile and docker-compose.yml for Frontend, Backend, and MySQL.',
-    status: 'in-progress',
-    priority: 'urgent',
     due_date: new Date(Date.now() + 3 * 86400000).toISOString().split('T')[0],
     created_at: new Date().toISOString(),
     updated_at: new Date().toISOString()
   },
   {
-    id: 5,
-    title: 'Implement GitHub Actions CI/CD Pipeline',
-    description: 'Automate testing, Docker image building, and pushing to Docker Hub.',
+    id: 3,
+    title: 'Review MySQL indexing and Docker networking questions',
+    description: 'Prepare answers for viva voce on container communication and volume persistence.',
     status: 'pending',
-    priority: 'high',
+    priority: 'medium',
+    due_date: new Date(Date.now() + 4 * 86400000).toISOString().split('T')[0],
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString()
+  },
+  {
+    id: 4,
+    title: 'Schedule project review with guide Dr. Sharma',
+    description: 'Discuss EC2 free-tier hosting and demo recording for final evaluation.',
+    status: 'pending',
+    priority: 'medium',
     due_date: new Date(Date.now() + 5 * 86400000).toISOString().split('T')[0],
     created_at: new Date().toISOString(),
     updated_at: new Date().toISOString()
+  },
+  {
+    id: 5,
+    title: 'Buy project file binder and print synopsis draft',
+    description: 'Print 2 copies of abstract and system requirement specifications.',
+    status: 'completed',
+    priority: 'low',
+    due_date: new Date(Date.now() - 86400000).toISOString().split('T')[0],
+    created_at: new Date(Date.now() - 86400000).toISOString(),
+    updated_at: new Date().toISOString()
+  },
+  {
+    id: 6,
+    title: 'Set up GitHub repository and push initial code',
+    description: 'Initialized git repository with main branch and added .gitignore.',
+    status: 'completed',
+    priority: 'high',
+    due_date: new Date(Date.now() - 2 * 86400000).toISOString().split('T')[0],
+    created_at: new Date(Date.now() - 2 * 86400000).toISOString(),
+    updated_at: new Date().toISOString()
   }
 ];
-let nextId = 6;
+let nextId = 7;
 
 // Helper to access DB pool
 const getPool = (req) => req.app.get('dbPool');

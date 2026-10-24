@@ -119,6 +119,13 @@ function setupEventListeners() {
     updateThemeIcon(newTheme);
   });
 
+  // Display Today's Date
+  const dateSubtitle = document.getElementById('dateSubtitle');
+  if (dateSubtitle) {
+    const options = { weekday: 'long', month: 'short', day: 'numeric' };
+    dateSubtitle.textContent = new Date().toLocaleDateString(undefined, options);
+  }
+
   // Modal Triggers
   elements.openNewTaskBtn.addEventListener('click', () => openTaskModal());
   elements.emptyCreateBtn.addEventListener('click', () => openTaskModal());
@@ -129,27 +136,102 @@ function setupEventListeners() {
   // Form Submit
   elements.taskForm.addEventListener('submit', handleTaskFormSubmit);
 
+  // Quick Add Form (Inline fast add)
+  const quickAddForm = document.getElementById('quickAddForm');
+  if (quickAddForm) {
+    quickAddForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const titleInput = document.getElementById('quickTaskTitle');
+      const priorityInput = document.getElementById('quickTaskPriority');
+      const dueDateInput = document.getElementById('quickTaskDueDate');
+      const title = titleInput.value.trim();
+      if (!title) return;
+
+      const payload = {
+        title,
+        description: '',
+        priority: priorityInput.value || 'medium',
+        status: 'pending',
+        due_date: dueDateInput.value || null
+      };
+
+      if (state.isBackendAvailable) {
+        try {
+          const res = await fetch(`${API_BASE}/tasks`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+          });
+          if (res.ok) {
+            const json = await res.json();
+            state.tasks.unshift(json.data);
+            titleInput.value = '';
+            dueDateInput.value = '';
+            renderTasks();
+            showToast('Task added!', 'success');
+            return;
+          }
+        } catch (err) {
+          console.error(err);
+        }
+      }
+
+      // Local fallback
+      const newTask = {
+        id: Date.now(),
+        ...payload,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
+      };
+      state.tasks.unshift(newTask);
+      localStorage.setItem('taskflow_backup', JSON.stringify(state.tasks));
+      titleInput.value = '';
+      dueDateInput.value = '';
+      renderTasks();
+      showToast('Task added!', 'success');
+    });
+  }
+
   // Delete Modal Triggers
   elements.closeDeleteModalBtn.addEventListener('click', closeDeleteModal);
   elements.cancelDeleteBtn.addEventListener('click', closeDeleteModal);
   elements.deleteModalBackdrop.addEventListener('click', closeDeleteModal);
   elements.confirmDeleteBtn.addEventListener('click', handleConfirmDelete);
 
-  // Status Tabs
+  // Sidebar Status Tabs
   elements.tabButtons.forEach(btn => {
     btn.addEventListener('click', () => {
       elements.tabButtons.forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
       state.filterStatus = btn.dataset.status;
+
+      const heading = document.getElementById('viewHeading');
+      if (heading) {
+        const textSpan = btn.querySelector('.nav-left span');
+        heading.textContent = textSpan ? textSpan.textContent : 'Tasks';
+      }
+
       renderTasks();
     });
   });
 
-  // Priority Filter
-  elements.priorityFilter.addEventListener('change', (e) => {
-    state.filterPriority = e.target.value;
-    renderTasks();
+  // Priority Filter Buttons
+  document.querySelectorAll('.prio-filter-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.prio-filter-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      state.filterPriority = btn.dataset.prio;
+      renderTasks();
+    });
   });
+
+  // Priority Filter dropdown (backward compatibility)
+  if (elements.priorityFilter) {
+    elements.priorityFilter.addEventListener('change', (e) => {
+      state.filterPriority = e.target.value;
+      renderTasks();
+    });
+  }
 
   // Sort Order
   elements.sortOrder.addEventListener('change', (e) => {
@@ -296,48 +378,57 @@ function getInitialDefaultTasks() {
   return [
     {
       id: 1,
-      title: 'Initialize Project Repository',
-      description: 'Set up GitHub repository, CI/CD pipelines, and project directory structure.',
-      status: 'completed',
-      priority: 'high',
-      due_date: new Date(Date.now() - 2 * 86400000).toISOString().split('T')[0],
+      title: 'Submit Cloud Computing lab record (Unit 3 & 4)',
+      description: 'Get sign-off from lab assistant and attach screenshot of AWS VPC architecture.',
+      status: 'pending',
+      priority: 'urgent',
+      due_date: new Date(Date.now() + 86400000).toISOString().split('T')[0],
       created_at: new Date().toISOString()
     },
     {
       id: 2,
-      title: 'Design UI / UX Mockups',
-      description: 'Create responsive design system, color palette, dark mode styles, and wireframes.',
-      status: 'completed',
-      priority: 'medium',
-      due_date: new Date(Date.now() - 86400000).toISOString().split('T')[0],
-      created_at: new Date().toISOString()
-    },
-    {
-      id: 3,
-      title: 'Build Express REST API',
-      description: 'Implement CRUD endpoints for task management with PostgreSQL integration.',
+      title: 'Prepare presentation slides for Minor Project viva',
+      description: 'Include architecture diagram, Docker Compose flow, and CI/CD pipeline steps.',
       status: 'in-progress',
       priority: 'high',
-      due_date: new Date(Date.now() + 2 * 86400000).toISOString().split('T')[0],
-      created_at: new Date().toISOString()
-    },
-    {
-      id: 4,
-      title: 'Implement Frontend State Management',
-      description: 'Connect JavaScript frontend to backend API with offline fallback support.',
-      status: 'in-progress',
-      priority: 'urgent',
       due_date: new Date(Date.now() + 3 * 86400000).toISOString().split('T')[0],
       created_at: new Date().toISOString()
     },
     {
-      id: 5,
-      title: 'Configure Docker Containers',
-      description: 'Create Dockerfile and docker-compose.yml for seamless multi-container orchestration.',
+      id: 3,
+      title: 'Review MySQL indexing and Docker networking questions',
+      description: 'Prepare answers for viva voce on container communication and volume persistence.',
+      status: 'pending',
+      priority: 'medium',
+      due_date: new Date(Date.now() + 4 * 86400000).toISOString().split('T')[0],
+      created_at: new Date().toISOString()
+    },
+    {
+      id: 4,
+      title: 'Schedule project review with guide Dr. Sharma',
+      description: 'Discuss EC2 free-tier hosting and demo recording for final evaluation.',
       status: 'pending',
       priority: 'medium',
       due_date: new Date(Date.now() + 5 * 86400000).toISOString().split('T')[0],
       created_at: new Date().toISOString()
+    },
+    {
+      id: 5,
+      title: 'Buy project file binder and print synopsis draft',
+      description: 'Print 2 copies of abstract and system requirement specifications.',
+      status: 'completed',
+      priority: 'low',
+      due_date: new Date(Date.now() - 86400000).toISOString().split('T')[0],
+      created_at: new Date(Date.now() - 86400000).toISOString()
+    },
+    {
+      id: 6,
+      title: 'Set up GitHub repository and push initial code',
+      description: 'Initialized git repository with main branch and added .gitignore.',
+      status: 'completed',
+      priority: 'high',
+      due_date: new Date(Date.now() - 2 * 86400000).toISOString().split('T')[0],
+      created_at: new Date(Date.now() - 2 * 86400000).toISOString()
     }
   ];
 }
