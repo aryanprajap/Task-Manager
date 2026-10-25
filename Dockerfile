@@ -1,32 +1,32 @@
 # ==========================================================
-# Task Management System - Backend Dockerfile
-# Multi-stage optimized Node.js Alpine container
+# Task Management System - Production Dockerfile
+# Serves Backend REST API and Frontend UI on port 3000
 # ==========================================================
 
 FROM node:20-alpine
 
-# Set working directory inside container
+# Set root application directory
 WORKDIR /app
 
-# Copy package manifests first to leverage Docker layer caching
-COPY backend/package*.json ./
+# Copy backend dependencies first for layer caching
+COPY backend/package*.json ./backend/
 
-# Install production dependencies only
+# Install dependencies inside backend directory
+WORKDIR /app/backend
 RUN npm install --omit=dev
 
-# Copy backend application source code
-COPY backend/ ./
+# Return to /app and copy backend and frontend code
+WORKDIR /app
+COPY backend ./backend
+COPY frontend ./frontend
 
-# Expose Express server port
-EXPOSE 5000
+# Expose port 3000
+EXPOSE 3000
 
-# Production environment variables
+# Set environment variables
 ENV NODE_ENV=production
-ENV PORT=5000
+ENV PORT=3000
 
-# Healthcheck for container status verification
-HEALTHCHECK --interval=30s --timeout=5s --start-period=5s --retries=3 \
-  CMD wget --no-verbose --tries=1 --spider http://localhost:5000/api/health || exit 1
-
-# Start the Node.js Express server
+# Start server from backend directory
+WORKDIR /app/backend
 CMD ["npm", "start"]

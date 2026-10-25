@@ -2,48 +2,24 @@ require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const path = require('path');
-const mysql = require('mysql2/promise');
 
 const taskRoutes = require('./routes/tasks');
 
 const app = express();
-const PORT = parseInt(process.env.PORT, 10) || 5000;
+const PORT = parseInt(process.env.PORT, 10) || 3000;
 
 // Middleware
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// MySQL Connection Pool Configuration
-const dbConfig = {
-  host: process.env.DB_HOST || 'localhost',
-  port: parseInt(process.env.DB_PORT, 10) || 3306,
-  user: process.env.DB_USER || 'taskuser',
-  password: process.env.DB_PASSWORD || 'taskpassword',
-  database: process.env.DB_NAME || 'taskdb',
-  waitForConnections: true,
-  connectionLimit: 10,
-  queueLimit: 0,
-  connectTimeout: 3000
-};
+// Database module
+const db = require('./database/db');
 
-let dbPool = null;
-
-async function initDatabase() {
-  try {
-    dbPool = mysql.createPool(dbConfig);
-    const connection = await dbPool.getConnection();
-    console.log(`✅  Successfully connected to MySQL database at ${dbConfig.host}:${dbConfig.port}/${dbConfig.database}`);
-    connection.release();
-    app.set('dbPool', dbPool);
-  } catch (err) {
-    console.warn(`⚠️  Could not connect to MySQL database (${dbConfig.host}:${dbConfig.port}): ${err.message}`);
-    console.warn('⚡  Running in in-memory mode for smooth development & testing.');
-    app.set('dbPool', null);
-  }
-}
-
-initDatabase();
+// Test database connection
+db.testConnection().then(connected => {
+  app.set('dbPool', connected ? db.pool : null);
+});
 
 // Serve frontend static files
 const frontendPath = path.resolve(__dirname, '../frontend');
