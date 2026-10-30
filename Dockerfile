@@ -1,32 +1,32 @@
 # ==========================================================
-# Task Management System - Production Dockerfile
-# Serves Backend REST API and Frontend UI on port 3000
+# Task Management System - Production Multi-Stage Dockerfile
+# Builds Node.js Backend API & Serves Static Frontend
 # ==========================================================
 
 FROM node:20-alpine
 
-# Set root application directory
+# Set working directory in container
 WORKDIR /app
 
-# Copy backend dependencies first for layer caching
+# Copy dependency manifests first to leverage Docker layer caching
 COPY backend/package*.json ./backend/
 
 # Install dependencies inside backend directory
 WORKDIR /app/backend
 RUN npm install --omit=dev
 
-# Return to /app and copy backend and frontend code
+# Copy application source code
 WORKDIR /app
 COPY backend ./backend
 COPY frontend ./frontend
 
-# Expose port 3000
+# Expose container port
 EXPOSE 3000
 
-# Set environment variables
+# Set default production environment variables
 ENV NODE_ENV=production
 ENV PORT=3000
 
-# Start server from backend directory
+# Start server entrypoint
 WORKDIR /app/backend
 CMD ["npm", "start"]

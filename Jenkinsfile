@@ -1,6 +1,10 @@
 pipeline {
     agent any
 
+    environment {
+        COMPOSE_PROJECT_NAME = 'taskmanager'
+    }
+
     stages {
 
         stage('Clone Repository') {
@@ -17,7 +21,7 @@ pipeline {
             }
         }
 
-        stage('Test') {
+        stage('Automated Tests') {
             steps {
                 dir('backend') {
                     sh 'npm test || true'
@@ -25,24 +29,31 @@ pipeline {
             }
         }
 
-        stage('Build Docker Image') {
+        stage('Docker Compose Build') {
             steps {
-                sh 'docker build -t task-manager:latest .'
+                sh 'docker compose build'
             }
         }
 
-        stage('Deploy') {
+        stage('Docker Compose Deploy') {
             steps {
-                sh '''
-                    docker stop task-manager || true
-                    docker rm task-manager || true
-
-                    docker run -d \
-                      --name task-manager \
-                      -p 3000:3000 \
-                      task-manager:latest
-                '''
+                sh 'docker compose down || true'
+                sh 'docker compose up -d'
             }
+        }
+
+        stage('Docker Verification') {
+            steps {
+                sh 'docker compose ps'
+                sh 'docker network ls'
+                sh 'docker volume ls'
+            }
+        }
+    }
+
+    post {
+        always {
+            cleanWs()
         }
     }
 }

@@ -1,0 +1,27 @@
+{
+  "name": "task-manager",
+  "version": "1.0.0",
+  "description": "Containerized Task Management System using Docker Compose and CI/CD",
+  "scripts": {
+    "docker:build": "docker compose build",
+    "docker:up": "docker compose up -d",
+    "docker:down": "docker compose down",
+    "docker:restart": "docker compose down && docker compose up -d",
+    "docker:logs": "docker compose logs -f",
+    "docker:ps": "docker compose ps",
+    "test": "cd backend && npm test",
+    "start": "docker compose up -d"
+  },
+  "keywords": [
+    "docker",
+    "docker-compose",
+    "devops",
+    "ci-cd",
+    "jenkins",
+    "nodejs",
+    "mysql"
+  ],
+  "author": "Aryan Prajapati",
+  "license": "ISC"
+}
+

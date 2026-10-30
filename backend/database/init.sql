@@ -3,8 +3,8 @@
 -- Project: Containerized Task Management System Using Docker & CI/CD
 -- ==========================================================
 
-CREATE DATABASE IF NOT EXISTS taskdb;
-USE taskdb;
+CREATE DATABASE IF NOT EXISTS taskmanager;
+USE taskmanager;
 
 CREATE TABLE IF NOT EXISTS tasks (
     id INT AUTO_INCREMENT PRIMARY KEY,
