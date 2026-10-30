@@ -1,0 +1,94 @@
+pipeline {
+    agent any
+
+    stages {
+
+        stage('Checkout') {
+            steps {
+                checkout scm
+            }
+        }
+
+        stage('Clone Repository') {
+            steps {
+                sh '''
+                    echo "Repository checked out successfully"
+                    git branch
+                    git log -1 --oneline
+                '''
+            }
+        }
+
+        stage('Install Dependencies') {
+            steps {
+                dir('backend') {
+                    sh 'npm install'
+                }
+            }
+        }
+
+        stage('Automated Tests') {
+            steps {
+                dir('backend') {
+                    sh 'npm test'
+                }
+            }
+        }
+
+        stage('Docker Build') {
+            steps {
+                sh '''
+                    echo "Building Docker image..."
+                    docker build -t task-manager:latest .
+                '''
+            }
+        }
+
+        stage('Docker Deploy') {
+            steps {
+                sh '''
+                    echo "Stopping previous container..."
+                    docker stop task-manager || true
+
+                    echo "Removing previous container..."
+                    docker rm task-manager || true
+
+                    echo "Starting new container..."
+                    docker run -d \
+                      --name task-manager \
+                      -p 3000:3000 \
+                      task-manager:latest
+
+                    echo "Container started successfully"
+                    docker ps
+                '''
+            }
+        }
+
+        stage('Docker Verification') {
+            steps {
+                sh '''
+                    echo "Verifying application container..."
+                    sleep 5
+                    docker ps --filter "name=task-manager"
+                    curl -f http://localhost:3000/health || true
+                '''
+            }
+        }
+    }
+
+    post {
+        always {
+            cleanWs()
+        }
+
+        success {
+            echo 'CI/CD Pipeline completed successfully!'
+        }
+
+        failure {
+            echo 'CI/CD Pipeline failed. Check the console output.'
+        }
+    }
+}
+
